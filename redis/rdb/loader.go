@@ -11,7 +11,7 @@ import (
 	"strconv"
 
 	"github.com/reborndb/go/errors"
-	"github.com/reborndb/reborn/extern/redis-port/pkg/rdb/digest"
+	"github.com/reborndb/go/redis/rdb/digest"
 )
 
 type Loader struct {
