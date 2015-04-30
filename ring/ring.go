@@ -20,14 +20,6 @@ type Ring struct {
 	size int
 }
 
-func ternInt(expr bool, v1 int, v2 int) int {
-	if expr {
-		return v1
-	} else {
-		return v2
-	}
-}
-
 // Read data from the ring buffer at offset
 // return n is the read data length, it can be less than buffer p size
 func (r *Ring) ReadAt(p []byte, offset int64) (n int, err error) {
