@@ -98,7 +98,7 @@ func (s *testRingSuite) TestMemRing(c *C) {
 }
 
 func (s *testRingSuite) TestFileRing(c *C) {
-	name := "./test_filering"
+	name := "/tmp/test_filering"
 	defer os.Remove(name)
 
 	r, err := NewFileRing(name, 20)
