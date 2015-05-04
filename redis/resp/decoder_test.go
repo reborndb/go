@@ -75,3 +75,22 @@ func TestDecoder(t *testing.T) {
 		assert.ErrorIsNil(t, err)
 	}
 }
+
+func TestDecodeRequest(t *testing.T) {
+	test := []string{
+		"PING\r\n",
+		"*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n",
+	}
+	for _, s := range test {
+		_, err := DecodeRequestFromBytes([]byte(s))
+		assert.ErrorIsNil(t, err)
+	}
+
+	invalidTest := []string{
+		"+OK\r\n",
+	}
+	for _, s := range invalidTest {
+		_, err := DecodeRequestFromBytes([]byte(s))
+		assert.Must(t, err != nil)
+	}
+}

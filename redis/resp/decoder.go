@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"bytes"
 	"strconv"
+	"strings"
 
 	"github.com/reborndb/go/errors"
 	"github.com/reborndb/go/io/ioutils"
@@ -22,6 +23,12 @@ func Decode(r *bufio.Reader) (Resp, error) {
 	return d.decodeResp()
 }
 
+// Decode RESP Request, return must be array type
+func DecodeRequest(r *bufio.Reader) (Resp, error) {
+	d := &decoder{r}
+	return d.decodeRequest()
+}
+
 func MustDecode(r *bufio.Reader) Resp {
 	resp, err := Decode(r)
 	if err != nil {
@@ -35,12 +42,63 @@ func DecodeFromBytes(p []byte) (Resp, error) {
 	return Decode(r)
 }
 
+func DecodeRequestFromBytes(p []byte) (Resp, error) {
+	r := bufio.NewReader(bytes.NewReader(p))
+	return DecodeRequest(r)
+}
+
 func MustDecodeFromBytes(p []byte) Resp {
 	resp, err := DecodeFromBytes(p)
 	if err != nil {
 		log.PanicError(err, "decode redis resp from bytes failed")
 	}
 	return resp
+}
+
+func isLetter(c byte) bool {
+	if c >= 'a' && c <= 'z' {
+		return true
+	}
+
+	if c >= 'A' && c <= 'Z' {
+		return true
+	}
+
+	return false
+}
+
+func (d *decoder) decodeRequest() (Resp, error) {
+	t, err := d.decodeType()
+	if err != nil {
+		return nil, err
+	}
+	switch t {
+	default:
+		if !isLetter(byte(t)) {
+			return nil, errors.Trace(ErrBadRespType)
+		}
+		// may be it's telnet text format
+		d.r.UnreadByte()
+
+		t, err := d.decodeText()
+		if err != nil {
+			return nil, err
+		}
+
+		items := strings.Split(t, " ")
+		resp := &Array{}
+		for _, item := range items {
+			resp.AppendBulkBytes([]byte(item))
+		}
+		return resp, nil
+
+	case TypeString, TypeError, TypeInt, TypeBulkBytes:
+		return nil, errors.Trace(ErrBadRespType)
+	case TypeArray:
+		resp := &Array{}
+		resp.Value, err = d.decodeArray()
+		return resp, err
+	}
 }
 
 func (d *decoder) decodeResp() (Resp, error) {
