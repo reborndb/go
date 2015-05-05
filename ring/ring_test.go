@@ -25,8 +25,9 @@ func (s *testRingSuite) testRing(c *C, r *Ring) {
 	var err error
 
 	p = make([]byte, 0)
-	_, err = r.ReadAt(p, 0)
-	c.Assert(err, NotNil)
+	n, err = r.ReadAt(p, 0)
+	c.Assert(err, IsNil)
+	c.Assert(n, Equals, 0)
 
 	p = []byte("0123456789")
 	n, err = r.Write(p)
@@ -47,7 +48,11 @@ func (s *testRingSuite) testRing(c *C, r *Ring) {
 	c.Assert(n, Equals, 5)
 	c.Assert(string(p), Equals, "56789")
 
-	_, err = r.ReadAt(p, 10)
+	n, err = r.ReadAt(p, 10)
+	c.Assert(err, IsNil)
+	c.Assert(n, Equals, 0)
+
+	_, err = r.ReadAt(p, 11)
 	c.Assert(err, NotNil)
 
 	p = []byte("0123456789")

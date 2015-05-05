@@ -4,6 +4,7 @@
 package ring
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -23,8 +24,8 @@ type Ring struct {
 // Read data from the ring buffer at offset
 // return n is the read data length, it can be less than buffer p size
 func (r *Ring) ReadAt(p []byte, offset int64) (n int, err error) {
-	if offset < 0 || offset >= int64(r.length) {
-		return 0, io.EOF
+	if offset < 0 || offset > int64(r.length) {
+		return 0, fmt.Errorf("invalid offset %d, not in [0, %d]", offset, r.length)
 	}
 
 	// Get oldest data offset
