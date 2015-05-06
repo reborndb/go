@@ -21,6 +21,7 @@ const (
 	TypeInt       RespType = ':'
 	TypeBulkBytes RespType = '$'
 	TypeArray     RespType = '*'
+	TypePing      RespType = '\n'
 )
 
 func (t RespType) String() string {
@@ -35,6 +36,8 @@ func (t RespType) String() string {
 		return "<bulkbytes>"
 	case TypeArray:
 		return "<array>"
+	case TypePing:
+		return "<ping>"
 	default:
 		return "<unknown>"
 	}
@@ -130,4 +133,14 @@ func (r *Array) AppendInt(n int64) {
 
 func (r *Array) AppendError(err error) {
 	r.Append(NewError(err))
+}
+
+type Ping byte
+
+func NewPing() Ping {
+	return Ping('\n')
+}
+
+func (r Ping) Type() RespType {
+	return TypePing
 }

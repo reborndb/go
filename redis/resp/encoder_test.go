@@ -61,6 +61,11 @@ func TestEncodeArray(t *testing.T) {
 	testEncodeAndCheck(t, resp, []byte("*3\r\n:0\r\n$-1\r\n$4\r\ntest\r\n"))
 }
 
+func TestEncodePing(t *testing.T) {
+	resp := NewPing()
+	testEncodeAndCheck(t, resp, []byte("\n"))
+}
+
 func testEncodeAndCheck(t *testing.T, resp Resp, expect []byte) {
 	b, err := EncodeToBytes(resp)
 	assert.ErrorIsNil(t, err)

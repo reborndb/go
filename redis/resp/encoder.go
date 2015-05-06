@@ -98,6 +98,8 @@ func (e *encoder) encodeResp(r Resp) error {
 			return err
 		}
 		return e.encodeArray(x.Value)
+	case Ping:
+		return errors.Trace(e.w.WriteByte('\n'))
 	}
 }
 

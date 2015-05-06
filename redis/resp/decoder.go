@@ -23,7 +23,7 @@ func Decode(r *bufio.Reader) (Resp, error) {
 	return d.decodeResp()
 }
 
-// Decode RESP Request, return must be array type
+// Decode RESP Request, return must be array type or ping type
 func DecodeRequest(r *bufio.Reader) (Resp, error) {
 	d := &decoder{r}
 	return d.decodeRequest()
@@ -94,6 +94,8 @@ func (d *decoder) decodeRequest() (Resp, error) {
 
 	case TypeString, TypeError, TypeInt, TypeBulkBytes:
 		return nil, errors.Trace(ErrBadRespType)
+	case TypePing:
+		return NewPing(), nil
 	case TypeArray:
 		resp := &Array{}
 		resp.Value, err = d.decodeArray()
@@ -129,6 +131,8 @@ func (d *decoder) decodeResp() (Resp, error) {
 		resp := &Array{}
 		resp.Value, err = d.decodeArray()
 		return resp, err
+	case TypePing:
+		return NewPing(), nil
 	}
 }
 

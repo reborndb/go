@@ -69,6 +69,7 @@ func TestDecoder(t *testing.T) {
 		"-Error message\r\n",
 		"*2\r\n$1\r\n0\r\n*0\r\n",
 		"*3\r\n$4\r\nEVAL\r\n$31\r\nreturn {1,2,{3,'Hello World!'}}\r\n$1\r\n0\r\n",
+		"\n",
 	}
 	for _, s := range test {
 		_, err := DecodeFromBytes([]byte(s))
@@ -80,6 +81,7 @@ func TestDecodeRequest(t *testing.T) {
 	test := []string{
 		"PING\r\n",
 		"*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n",
+		"\n",
 	}
 	for _, s := range test {
 		_, err := DecodeRequestFromBytes([]byte(s))
