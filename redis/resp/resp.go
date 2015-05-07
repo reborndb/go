@@ -3,7 +3,11 @@
 
 package resp
 
-import "github.com/reborndb/go/errors"
+import (
+	"fmt"
+
+	"github.com/reborndb/go/errors"
+)
 
 var (
 	ErrBadRespType     = errors.Static("bad resp type")
@@ -143,4 +147,26 @@ func NewPing() Ping {
 
 func (r Ping) Type() RespType {
 	return TypePing
+}
+
+// RESP Request is a array of bulk strings.
+func NewRequest(cmd string, args ...interface{}) Resp {
+	ay := NewArray()
+	ay.AppendBulkBytes([]byte(cmd))
+
+	for _, arg := range args {
+		switch v := arg.(type) {
+		case string:
+			ay.AppendBulkBytes([]byte(v))
+		case []byte:
+			ay.AppendBulkBytes(v)
+		case nil:
+			// we use an empty string for nil arg
+			ay.AppendBulkBytes([]byte(""))
+		default:
+			ay.AppendBulkBytes([]byte(fmt.Sprintf("%v", v)))
+		}
+	}
+
+	return ay
 }

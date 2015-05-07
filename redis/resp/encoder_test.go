@@ -66,6 +66,14 @@ func TestEncodePing(t *testing.T) {
 	testEncodeAndCheck(t, resp, []byte("\n"))
 }
 
+func TestEncodeRequest(t *testing.T) {
+	resp := NewRequest("PING")
+	testEncodeAndCheck(t, resp, []byte("*1\r\n$4\r\nPING\r\n"))
+
+	resp = NewRequest("SELECT", 1)
+	testEncodeAndCheck(t, resp, []byte("*2\r\n$6\r\nSELECT\r\n$1\r\n1\r\n"))
+}
+
 func testEncodeAndCheck(t *testing.T, resp Resp, expect []byte) {
 	b, err := EncodeToBytes(resp)
 	assert.ErrorIsNil(t, err)
