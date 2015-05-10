@@ -16,7 +16,7 @@ type CountReader struct {
 
 func NewCountReader(r io.Reader, p *atomic2.Int64) *CountReader {
 	if p == nil {
-		p = &atomic2.Int64{}
+		p = new(atomic2.Int64)
 	}
 	return &CountReader{p: p, r: r}
 }
@@ -42,7 +42,7 @@ type CountWriter struct {
 
 func NewCountWriter(w io.Writer, p *atomic2.Int64) *CountWriter {
 	if p == nil {
-		p = &atomic2.Int64{}
+		p = new(atomic2.Int64)
 	}
 	return &CountWriter{p: p, w: w}
 }
