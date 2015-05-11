@@ -69,3 +69,7 @@ func (s *String) CompareAndSwap(oldval, newval string) (swqpped bool) {
 	}
 	return false
 }
+
+func (s *String) String() string {
+	return s.Get()
+}
