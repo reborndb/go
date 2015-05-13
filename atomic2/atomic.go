@@ -6,6 +6,7 @@ package atomic2
 import (
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 type Int64 int64
@@ -68,4 +69,26 @@ func (s *String) CompareAndSwap(oldval, newval string) (swqpped bool) {
 		return true
 	}
 	return false
+}
+
+func (s *String) String() string {
+	return s.Get()
+}
+
+type Duration int64
+
+func (d *Duration) Add(duration time.Duration) time.Duration {
+	return time.Duration(atomic.AddInt64((*int64)(d), int64(duration)))
+}
+
+func (d *Duration) Set(duration time.Duration) {
+	atomic.StoreInt64((*int64)(d), int64(duration))
+}
+
+func (d *Duration) Get() time.Duration {
+	return time.Duration(atomic.LoadInt64((*int64)(d)))
+}
+
+func (d *Duration) CompareAndSwap(oldval, newval time.Duration) (swapped bool) {
+	return atomic.CompareAndSwapInt64((*int64)(d), int64(oldval), int64(newval))
 }
