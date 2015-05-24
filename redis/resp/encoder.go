@@ -51,13 +51,13 @@ func MustEncode(w *bufio.Writer, r Resp) {
 
 func EncodeToBytes(r Resp) ([]byte, error) {
 	var b bytes.Buffer
-	err := Encode(bufio.NewWriter(&b), r)
+	err := Encode(bufio.NewWriterSize(&b, 16), r)
 	return b.Bytes(), err
 }
 
 func EncodeToString(r Resp) (string, error) {
 	var b bytes.Buffer
-	err := Encode(bufio.NewWriter(&b), r)
+	err := Encode(bufio.NewWriterSize(&b, 16), r)
 	return b.String(), err
 }
 
