@@ -80,6 +80,7 @@ func TestDecoder(t *testing.T) {
 func TestDecodeRequest(t *testing.T) {
 	test := []string{
 		"PING\r\n",
+		"ECHO   abc\r\n",
 		"*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n",
 		"\n",
 	}

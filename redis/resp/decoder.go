@@ -85,7 +85,7 @@ func (d *decoder) decodeRequest() (Resp, error) {
 			return nil, err
 		}
 
-		items := strings.Split(t, " ")
+		items := strings.Fields(t)
 		resp := &Array{}
 		for _, item := range items {
 			resp.AppendBulkBytes([]byte(item))
