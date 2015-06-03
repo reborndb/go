@@ -26,6 +26,9 @@ func (r *simpleReader) Read(b []byte) (int, error) {
 }
 
 func SimpleReader(r io.Reader) io.Reader {
+	if _, ok := r.(*simpleReader); ok {
+		return r
+	}
 	return &simpleReader{r: r}
 }
 
@@ -46,6 +49,10 @@ func (w *simpleWriter) Write(b []byte) (int, error) {
 }
 
 func SimpleWriter(w io.Writer) io.Writer {
+	if _, ok := w.(*simpleWriter); ok {
+		return w
+	}
+
 	return &simpleWriter{w: w}
 }
 
