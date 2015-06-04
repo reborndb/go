@@ -36,11 +36,20 @@ func itos(i int64) string {
 }
 
 func Encode(w *bufio.Writer, r Resp) error {
+	return encode(w, r, false)
+}
+
+func encode(w *bufio.Writer, r Resp, needFlush bool) error {
 	e := &encoder{w}
 	if err := e.encodeResp(r); err != nil {
 		return err
 	}
-	return errors.Trace(w.Flush())
+
+	if needFlush {
+		return w.Flush()
+	} else {
+		return nil
+	}
 }
 
 func MustEncode(w *bufio.Writer, r Resp) {
@@ -51,13 +60,13 @@ func MustEncode(w *bufio.Writer, r Resp) {
 
 func EncodeToBytes(r Resp) ([]byte, error) {
 	var b bytes.Buffer
-	err := Encode(bufio.NewWriterSize(&b, 16), r)
+	err := encode(bufio.NewWriterSize(&b, 16), r, true)
 	return b.Bytes(), err
 }
 
 func EncodeToString(r Resp) (string, error) {
 	var b bytes.Buffer
-	err := Encode(bufio.NewWriterSize(&b, 16), r)
+	err := encode(bufio.NewWriterSize(&b, 16), r, true)
 	return b.String(), err
 }
 
