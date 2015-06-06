@@ -58,15 +58,17 @@ func MustEncode(w *bufio.Writer, r Resp) {
 	}
 }
 
+const defaultEncodeBufSize = 16
+
 func EncodeToBytes(r Resp) ([]byte, error) {
 	var b bytes.Buffer
-	err := encode(bufio.NewWriterSize(&b, 16), r, true)
+	err := encode(bufio.NewWriterSize(&b, defaultEncodeBufSize), r, true)
 	return b.Bytes(), err
 }
 
 func EncodeToString(r Resp) (string, error) {
 	var b bytes.Buffer
-	err := encode(bufio.NewWriterSize(&b, 16), r, true)
+	err := encode(bufio.NewWriterSize(&b, defaultEncodeBufSize), r, true)
 	return b.String(), err
 }
 
