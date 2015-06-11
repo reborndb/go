@@ -16,7 +16,7 @@ type HandlerFunc func(arg0 interface{}, args ...[]byte) (resp.Resp, error)
 
 type HandlerTable map[string]HandlerFunc
 
-func NewHandlerTable(o interface{}) (map[string]HandlerFunc, error) {
+func NewHandlerTable(o interface{}, f func(string) bool) (map[string]HandlerFunc, error) {
 	if o == nil {
 		return nil, errors.New("handler is nil")
 	}
@@ -24,9 +24,10 @@ func NewHandlerTable(o interface{}) (map[string]HandlerFunc, error) {
 	r := reflect.TypeOf(o)
 	for i := 0; i < r.NumMethod(); i++ {
 		m := r.Method(i)
-		if m.Name[0] < 'A' || m.Name[0] > 'Z' {
+		if f != nil && f(m.Name) {
 			continue
 		}
+
 		n := strings.ToLower(m.Name)
 		if h, err := createHandlerFunc(o, &m.Func); err != nil {
 			return nil, err
@@ -39,16 +40,16 @@ func NewHandlerTable(o interface{}) (map[string]HandlerFunc, error) {
 	return t, nil
 }
 
-func MustHandlerTable(o interface{}) map[string]HandlerFunc {
-	t, err := NewHandlerTable(o)
+func MustHandlerTable(o interface{}, f func(string) bool) map[string]HandlerFunc {
+	t, err := NewHandlerTable(o, f)
 	if err != nil {
 		log.PanicError(err, "create redis handler map failed")
 	}
 	return t
 }
 
-func createHandlerFunc(o interface{}, f *reflect.Value) (HandlerFunc, error) {
-	t := f.Type()
+func createHandlerFunc(o interface{}, r *reflect.Value) (HandlerFunc, error) {
+	t := r.Type()
 	arg0Type := reflect.TypeOf((*interface{})(nil)).Elem()
 	argsType := reflect.TypeOf([][]byte{})
 	if t.NumIn() != 3 || t.In(1) != arg0Type || t.In(2) != argsType {
@@ -69,9 +70,9 @@ func createHandlerFunc(o interface{}, f *reflect.Value) (HandlerFunc, error) {
 		var input, output []reflect.Value
 		input = []reflect.Value{reflect.ValueOf(o), arg0Value, reflect.ValueOf(args)}
 		if t.IsVariadic() {
-			output = f.CallSlice(input)
+			output = r.CallSlice(input)
 		} else {
-			output = f.Call(input)
+			output = r.Call(input)
 		}
 		var ret0 resp.Resp
 		var ret1 error

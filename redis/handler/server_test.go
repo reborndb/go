@@ -38,9 +38,21 @@ func testmapcount(t *testing.T, m1, m2 map[string]int) {
 	}
 }
 
+func (h *testHandler) filter(name string) bool {
+	if len(name) == 0 {
+		return true
+	}
+
+	if name[0] < 'A' || name[0] > 'Z' {
+		return true
+	}
+
+	return false
+}
+
 func TestHandlerFunc(t *testing.T) {
 	h := &testHandler{make(map[string]int)}
-	s, err := NewServer(h)
+	s, err := NewServer(h, h.filter)
 	assert.ErrorIsNil(t, err)
 	key1, key2, key3, key4 := "key1", "key2", "key3", "key4"
 	s.t["get"](nil)
@@ -59,7 +71,7 @@ func TestHandlerFunc(t *testing.T) {
 
 func TestServerServe(t *testing.T) {
 	h := &testHandler{make(map[string]int)}
-	s, err := NewServer(h)
+	s, err := NewServer(h, h.filter)
 	assert.ErrorIsNil(t, err)
 	resp, err := resp.Decode(bufio.NewReader(bytes.NewReader([]byte("*2\r\n$3\r\nset\r\n$3\r\nfoo\r\n"))))
 	assert.ErrorIsNil(t, err)
