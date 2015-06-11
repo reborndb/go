@@ -12,8 +12,8 @@ type Server struct {
 	t HandlerTable
 }
 
-func NewServer(o interface{}) (*Server, error) {
-	t, err := NewHandlerTable(o)
+func NewServer(o interface{}, f func(string) bool) (*Server, error) {
+	t, err := NewHandlerTable(o, f)
 	if err != nil {
 		return nil, err
 	}
@@ -27,8 +27,8 @@ func NewServerWithTable(t HandlerTable) (*Server, error) {
 	return &Server{t}, nil
 }
 
-func MustServer(o interface{}) *Server {
-	return &Server{MustHandlerTable(o)}
+func MustServer(o interface{}, f func(string) bool) *Server {
+	return &Server{MustHandlerTable(o, f)}
 }
 
 func (s *Server) Dispatch(arg0 interface{}, respArg resp.Resp) (resp.Resp, error) {
