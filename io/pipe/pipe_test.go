@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/juju/errors"
 	"github.com/reborndb/go/bytesize"
-	"github.com/reborndb/go/errors"
 	"github.com/reborndb/go/io/ioutils"
 	"github.com/reborndb/go/testing/assert"
 )
@@ -42,7 +42,7 @@ func testPipe1(t *testing.T, fileName string) {
 
 	buf := make([]byte, 64)
 	n, err := ioutils.ReadFull(r, buf)
-	assert.Must(t, errors.Equal(err, io.EOF))
+	assert.Must(t, errors.Cause(err) == io.EOF)
 	assert.Must(t, n == len(s))
 	assert.Must(t, string(buf[:n]) == s)
 	assert.ErrorIsNil(t, r.Close())
@@ -72,7 +72,7 @@ func testPipe2(t *testing.T, fileName string) {
 
 	buf := make([]byte, len(s)*c*2)
 	n, err := ioutils.ReadFull(r, buf)
-	assert.Must(t, errors.Equal(err, io.EOF))
+	assert.Must(t, errors.Cause(err) == io.EOF)
 	buf = buf[:n]
 	for i := 0; i < c; i++ {
 		m := fmt.Sprintf("[%d]%s ", i, s)
@@ -100,7 +100,7 @@ func testPipe3(t *testing.T, fileName string) {
 		buf := make([]byte, size)
 		for {
 			n, err := r.Read(buf)
-			if errors.Equal(err, io.EOF) {
+			if errors.Cause(err) == io.EOF {
 				break
 			}
 			assert.ErrorIsNil(t, err)
@@ -178,7 +178,7 @@ func testPipe4(t *testing.T, fileName string) {
 		assert.Must(t, buf[i] == byte(i))
 	}
 	_, err = ioutils.ReadFull(r, buf)
-	assert.Must(t, errors.Equal(err, io.EOF))
+	assert.Must(t, errors.Cause(err) == io.EOF)
 	assert.ErrorIsNil(t, r.Close())
 }
 
@@ -237,7 +237,7 @@ func TestPipeReadClose(t *testing.T) {
 		if expect == nil {
 			expect = io.EOF
 		}
-		assert.Must(t, errors.Equal(err, expect))
+		assert.Must(t, errors.Cause(err) == errors.Cause(expect))
 		assert.Must(t, n == 0)
 		assert.ErrorIsNil(t, r.Close())
 	}
@@ -252,7 +252,7 @@ func TestPipeReadClose2(t *testing.T) {
 	n, err := r.Read(make([]byte, 64))
 	<-c
 
-	assert.Must(t, errors.Equal(err, io.ErrClosedPipe))
+	assert.Must(t, errors.Cause(err) == io.ErrClosedPipe)
 	assert.Must(t, n == 0)
 	assert.ErrorIsNil(t, w.Close())
 }
@@ -274,7 +274,7 @@ func TestPipeWriteClose(t *testing.T) {
 		if expect == nil {
 			expect = io.ErrClosedPipe
 		}
-		assert.Must(t, errors.Equal(err, expect))
+		assert.Must(t, errors.Cause(err) == errors.Cause(expect))
 		assert.Must(t, n == 0)
 		assert.ErrorIsNil(t, w.Close())
 	}
@@ -291,7 +291,7 @@ func TestWriteEmpty(t *testing.T) {
 
 	buf := make([]byte, 4096)
 	n, err := ioutils.ReadFull(r, buf)
-	assert.Must(t, errors.Equal(err, io.EOF))
+	assert.Must(t, errors.Cause(err) == io.EOF)
 	assert.Must(t, n == 0)
 	assert.ErrorIsNil(t, r.Close())
 }
@@ -307,7 +307,7 @@ func TestWriteNil(t *testing.T) {
 
 	buf := make([]byte, 4096)
 	n, err := ioutils.ReadFull(r, buf)
-	assert.Must(t, errors.Equal(err, io.EOF))
+	assert.Must(t, errors.Cause(err) == io.EOF)
 	assert.Must(t, n == 0)
 	assert.ErrorIsNil(t, r.Close())
 }
@@ -329,10 +329,10 @@ func TestWriteAfterWriterClose(t *testing.T) {
 
 	buf := make([]byte, 4096)
 	n, err := ioutils.ReadFull(r, buf)
-	assert.Must(t, errors.Equal(err, io.EOF))
+	assert.Must(t, errors.Cause(err) == io.EOF)
 	assert.Must(t, string(buf[:n]) == s)
 
 	err = <-errs
-	assert.Must(t, errors.Equal(err, io.ErrClosedPipe))
+	assert.Must(t, errors.Cause(err) == io.ErrClosedPipe)
 	assert.ErrorIsNil(t, r.Close())
 }

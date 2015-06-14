@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/reborndb/go/errors"
+	"github.com/juju/errors"
 	"github.com/reborndb/go/log"
 )
 
@@ -27,8 +27,8 @@ var (
 )
 
 var (
-	ErrBadBytesize     = errors.Static("invalid byte size")
-	ErrBadBytesizeUnit = errors.Static("invalid byte size unit")
+	ErrBadBytesize     = errors.New("invalid byte size")
+	ErrBadBytesizeUnit = errors.New("invalid byte size unit")
 )
 
 func Parse(s string) (int64, error) {

@@ -6,7 +6,7 @@ package bytesize
 import (
 	"testing"
 
-	"github.com/reborndb/go/errors"
+	"github.com/juju/errors"
 	"github.com/reborndb/go/testing/assert"
 )
 
@@ -38,9 +38,9 @@ func TestBytesize(t *testing.T) {
 func TestBytesizeError(t *testing.T) {
 	var err error
 	_, err = Parse("--1")
-	assert.Must(t, errors.Equal(err, ErrBadBytesize))
+	assert.Must(t, errors.Cause(err) == ErrBadBytesize)
 	_, err = Parse("hello world")
-	assert.Must(t, errors.Equal(err, ErrBadBytesize))
+	assert.Must(t, errors.Cause(err) == ErrBadBytesize)
 	_, err = Parse("123.132.32")
-	assert.Must(t, errors.Equal(err, ErrBadBytesize))
+	assert.Must(t, errors.Cause(err) == ErrBadBytesize)
 }

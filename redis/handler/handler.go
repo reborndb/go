@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/reborndb/go/errors"
+	"github.com/juju/errors"
 	"github.com/reborndb/go/log"
 	"github.com/reborndb/go/redis/resp"
 )
