@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/juju/errors"
-	"github.com/reborndb/go/log"
+	"github.com/ngaut/log"
 	"github.com/reborndb/go/redis/resp"
 )
 
@@ -42,7 +42,7 @@ func NewHandlerTable(o interface{}) (map[string]HandlerFunc, error) {
 func MustHandlerTable(o interface{}) map[string]HandlerFunc {
 	t, err := NewHandlerTable(o)
 	if err != nil {
-		log.PanicError(err, "create redis handler map failed")
+		log.Fatalf("create redis handler map failed - %s", err)
 	}
 	return t
 }
