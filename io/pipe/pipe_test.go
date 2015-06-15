@@ -21,18 +21,18 @@ func TestT(t *testing.T) {
 	TestingT(t)
 }
 
-var _ = Suite(&testIoPipe{})
+var _ = Suite(&testIoPipeSuite{})
 
-type testIoPipe struct {
+type testIoPipeSuite struct {
 }
 
-func (s *testIoPipe) SetUpSuite(c *C) {
+func (s *testIoPipeSuite) SetUpSuite(c *C) {
 }
 
-func (s *testIoPipe) TearDownSuite(c *C) {
+func (s *testIoPipeSuite) TearDownSuite(c *C) {
 }
 
-func (s *testIoPipe) openPipe(c *C, fileName string) (Reader, Writer) {
+func (s *testIoPipeSuite) openPipe(c *C, fileName string) (Reader, Writer) {
 	buffSize := bytesize.KB * 8
 	fileSize := bytesize.MB * 32
 	if fileName == "" {
@@ -44,7 +44,7 @@ func (s *testIoPipe) openPipe(c *C, fileName string) (Reader, Writer) {
 	}
 }
 
-func (s *testIoPipe) testPipe1(c *C, fileName string) {
+func (s *testIoPipeSuite) testPipe1(c *C, fileName string) {
 	r, w := s.openPipe(c, fileName)
 
 	ss := "Hello world!!"
@@ -63,12 +63,12 @@ func (s *testIoPipe) testPipe1(c *C, fileName string) {
 	c.Assert(r.Close(), IsNil)
 }
 
-func (s *testIoPipe) TestPipe1(c *C) {
+func (s *testIoPipeSuite) TestPipe1(c *C) {
 	s.testPipe1(c, "")
 	s.testPipe1(c, "/tmp/pipe.test")
 }
 
-func (s *testIoPipe) testPipe2(c *C, fileName string) {
+func (s *testIoPipeSuite) testPipe2(c *C, fileName string) {
 	r, w := s.openPipe(c, fileName)
 
 	cc := 1024 * 128
@@ -101,12 +101,12 @@ func (s *testIoPipe) testPipe2(c *C, fileName string) {
 	c.Assert(r.Close(), IsNil)
 }
 
-func (s *testIoPipe) TestPipe2(c *C) {
+func (s *testIoPipeSuite) TestPipe2(c *C) {
 	s.testPipe2(c, "")
 	s.testPipe2(c, "/tmp/pipe.test")
 }
 
-func (s *testIoPipe) testPipe3(c *C, fileName string) {
+func (s *testIoPipeSuite) testPipe3(c *C, fileName string) {
 	r, w := s.openPipe(c, fileName)
 
 	ch := make(chan int)
@@ -154,12 +154,12 @@ func (s *testIoPipe) testPipe3(c *C, fileName string) {
 	c.Assert(sum, Equals, 0)
 }
 
-func (s *testIoPipe) TestPipe3(c *C) {
+func (s *testIoPipeSuite) TestPipe3(c *C) {
 	s.testPipe3(c, "")
 	s.testPipe3(c, "/tmp/pipe.test")
 }
 
-func (s *testIoPipe) testPipe4(c *C, fileName string) {
+func (s *testIoPipeSuite) testPipe4(c *C, fileName string) {
 	r, w := s.openPipe(c, fileName)
 
 	key := []byte("spinlock aes-128")
@@ -196,7 +196,10 @@ func (s *testIoPipe) testPipe4(c *C, fileName string) {
 	e.CryptBlocks(buf, buf)
 
 	for i := 0; i < len(buf); i++ {
-		c.Assert(buf[i], Equals, byte(i))
+		// make gocheck faster
+		if buf[i] != byte(i) {
+			c.Assert(buf[i], Equals, byte(i))
+		}
 	}
 
 	_, err = ioutils.ReadFull(r, buf)
@@ -204,7 +207,7 @@ func (s *testIoPipe) testPipe4(c *C, fileName string) {
 	c.Assert(r.Close(), IsNil)
 }
 
-func (s *testIoPipe) TestPipe4(c *C) {
+func (s *testIoPipeSuite) TestPipe4(c *C) {
 	s.testPipe4(c, "")
 	s.testPipe4(c, "/tmp/pipe.test")
 }
@@ -228,7 +231,7 @@ var pipeTests = []pipeTest{
 	{false, io.ErrShortWrite, true},
 }
 
-func (s *testIoPipe) delayClose(c *C, closer Closer, ch chan int, u pipeTest) {
+func (s *testIoPipeSuite) delayClose(c *C, closer Closer, ch chan int, u pipeTest) {
 	time.Sleep(time.Millisecond * 100)
 	var err error
 	if u.witherr {
@@ -241,7 +244,7 @@ func (s *testIoPipe) delayClose(c *C, closer Closer, ch chan int, u pipeTest) {
 	ch <- 0
 }
 
-func (s *testIoPipe) TestPipeReadClose(c *C) {
+func (s *testIoPipeSuite) TestPipeReadClose(c *C) {
 	for _, u := range pipeTests {
 		r, w := Pipe()
 		ch := make(chan int, 1)
@@ -267,7 +270,7 @@ func (s *testIoPipe) TestPipeReadClose(c *C) {
 	}
 }
 
-func (s *testIoPipe) TestPipeReadClose2(c *C) {
+func (s *testIoPipeSuite) TestPipeReadClose2(c *C) {
 	r, w := Pipe()
 	ch := make(chan int, 1)
 
@@ -281,7 +284,7 @@ func (s *testIoPipe) TestPipeReadClose2(c *C) {
 	c.Assert(w.Close(), IsNil)
 }
 
-func (s *testIoPipe) TestPipeWriteClose(c *C) {
+func (s *testIoPipeSuite) TestPipeWriteClose(c *C) {
 	for _, u := range pipeTests {
 		r, w := Pipe()
 		ch := make(chan int, 1)
@@ -305,7 +308,7 @@ func (s *testIoPipe) TestPipeWriteClose(c *C) {
 	}
 }
 
-func (s *testIoPipe) TestWriteEmpty(c *C) {
+func (s *testIoPipeSuite) TestWriteEmpty(c *C) {
 	r, w := Pipe()
 
 	go func() {
@@ -321,7 +324,7 @@ func (s *testIoPipe) TestWriteEmpty(c *C) {
 	c.Assert(r.Close(), IsNil)
 }
 
-func (s *testIoPipe) TestWriteNil(c *C) {
+func (s *testIoPipeSuite) TestWriteNil(c *C) {
 	r, w := Pipe()
 
 	go func() {
@@ -337,7 +340,7 @@ func (s *testIoPipe) TestWriteNil(c *C) {
 	c.Assert(r.Close(), IsNil)
 }
 
-func (s *testIoPipe) TestWriteAfterWriterClose(c *C) {
+func (s *testIoPipeSuite) TestWriteAfterWriterClose(c *C) {
 	r, w := Pipe()
 
 	ss := "hello"
