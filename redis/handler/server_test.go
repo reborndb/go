@@ -21,12 +21,6 @@ var _ = Suite(&testRedisHandlerSuite{})
 type testRedisHandlerSuite struct {
 }
 
-func (s *testRedisHandlerSuite) SetUpSuite(c *C) {
-}
-
-func (s *testRedisHandlerSuite) TearDownSuite(c *C) {
-}
-
 type testHandler struct {
 	c map[string]int
 }

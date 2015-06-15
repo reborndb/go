@@ -18,12 +18,6 @@ var _ = Suite(&testRedisRespSuite{})
 type testRedisRespSuite struct {
 }
 
-func (s *testRedisRespSuite) SetUpSuite(c *C) {
-}
-
-func (s *testRedisRespSuite) TearDownSuite(c *C) {
-}
-
 func (s *testRedisRespSuite) TestDecodeInvalidRequests(c *C) {
 	test := []string{
 		"",

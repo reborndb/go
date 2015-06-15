@@ -26,12 +26,6 @@ var _ = Suite(&testIoPipeSuite{})
 type testIoPipeSuite struct {
 }
 
-func (s *testIoPipeSuite) SetUpSuite(c *C) {
-}
-
-func (s *testIoPipeSuite) TearDownSuite(c *C) {
-}
-
 func (s *testIoPipeSuite) openPipe(c *C, fileName string) (Reader, Writer) {
 	buffSize := bytesize.KB * 8
 	fileSize := bytesize.MB * 32

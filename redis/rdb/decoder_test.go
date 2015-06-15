@@ -23,12 +23,6 @@ var _ = gocheck.Suite(&testRedisRdbSuite{})
 type testRedisRdbSuite struct {
 }
 
-func (s *testRedisRdbSuite) SetUpSuite(c *gocheck.C) {
-}
-
-func (s *testRedisRdbSuite) TearDownSuite(c *gocheck.C) {
-}
-
 func (s *testRedisRdbSuite) hexStringToObject(c *gocheck.C, ss string) interface{} {
 	p, err := hex.DecodeString(strings.NewReplacer("\t", "", "\r", "", "\n", "", " ", "").Replace(ss))
 	c.Assert(err, gocheck.IsNil)

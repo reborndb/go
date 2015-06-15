@@ -19,12 +19,6 @@ var _ = Suite(&testBytesizeSuite{})
 type testBytesizeSuite struct {
 }
 
-func (s *testBytesizeSuite) SetUpSuite(c *C) {
-}
-
-func (s *testBytesizeSuite) TearDownSuite(c *C) {
-}
-
 func (s *testBytesizeSuite) TestBytesize(c *C) {
 	c.Assert(MustParse("1"), Equals, int64(1))
 	c.Assert(MustParse("1B"), Equals, int64(1))
