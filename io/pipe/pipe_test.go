@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/juju/errors"
 	"github.com/reborndb/go/bytesize"
+	"github.com/reborndb/go/errors2"
 	"github.com/reborndb/go/io/ioutils"
 	. "gopkg.in/check.v1"
 )
@@ -51,7 +51,7 @@ func (s *testIoPipeSuite) testPipe1(c *C, fileName string) {
 
 	buf := make([]byte, 64)
 	n, err := ioutils.ReadFull(r, buf)
-	c.Assert(errors.Cause(err), Equals, io.EOF)
+	c.Assert(errors2.ErrorEqual(err, io.EOF), Equals, true)
 	c.Assert(n, Equals, len(ss))
 	c.Assert(string(buf[:n]), Equals, ss)
 	c.Assert(r.Close(), IsNil)
@@ -81,7 +81,7 @@ func (s *testIoPipeSuite) testPipe2(c *C, fileName string) {
 
 	buf := make([]byte, len(ss)*cc*2)
 	n, err := ioutils.ReadFull(r, buf)
-	c.Assert(errors.Cause(err), Equals, io.EOF)
+	c.Assert(errors2.ErrorEqual(err, io.EOF), Equals, true)
 
 	buf = buf[:n]
 	for i := 0; i < cc; i++ {
@@ -111,7 +111,8 @@ func (s *testIoPipeSuite) testPipe3(c *C, fileName string) {
 		buf := make([]byte, size)
 		for {
 			n, err := r.Read(buf)
-			if errors.Cause(err) == io.EOF {
+
+			if errors2.ErrorEqual(err, io.EOF) {
 				break
 			}
 
@@ -197,7 +198,7 @@ func (s *testIoPipeSuite) testPipe4(c *C, fileName string) {
 	}
 
 	_, err = ioutils.ReadFull(r, buf)
-	c.Assert(errors.Cause(err), Equals, io.EOF)
+	c.Assert(errors2.ErrorEqual(err, io.EOF), Equals, true)
 	c.Assert(r.Close(), IsNil)
 }
 
@@ -258,7 +259,7 @@ func (s *testIoPipeSuite) TestPipeReadClose(c *C) {
 			expect = io.EOF
 		}
 
-		c.Assert(errors.Cause(err), Equals, expect)
+		c.Assert(errors2.ErrorEqual(err, expect), Equals, true)
 		c.Assert(n, Equals, 0)
 		c.Assert(r.Close(), IsNil)
 	}
@@ -273,7 +274,8 @@ func (s *testIoPipeSuite) TestPipeReadClose2(c *C) {
 	n, err := r.Read(make([]byte, 64))
 	<-ch
 
-	c.Assert(errors.Cause(err), Equals, io.ErrClosedPipe)
+	c.Assert(errors2.ErrorEqual(err, io.ErrClosedPipe), Equals, true)
+
 	c.Assert(n, Equals, 0)
 	c.Assert(w.Close(), IsNil)
 }
@@ -296,7 +298,8 @@ func (s *testIoPipeSuite) TestPipeWriteClose(c *C) {
 			expect = io.ErrClosedPipe
 		}
 
-		c.Assert(errors.Cause(err), Equals, expect)
+		c.Assert(errors2.ErrorEqual(err, expect), Equals, true)
+
 		c.Assert(n, Equals, 0)
 		c.Assert(w.Close(), IsNil)
 	}
@@ -313,7 +316,7 @@ func (s *testIoPipeSuite) TestWriteEmpty(c *C) {
 
 	buf := make([]byte, 4096)
 	n, err := ioutils.ReadFull(r, buf)
-	c.Assert(errors.Cause(err), Equals, io.EOF)
+	c.Assert(errors2.ErrorEqual(err, io.EOF), Equals, true)
 	c.Assert(n, Equals, 0)
 	c.Assert(r.Close(), IsNil)
 }
@@ -329,7 +332,7 @@ func (s *testIoPipeSuite) TestWriteNil(c *C) {
 
 	buf := make([]byte, 4096)
 	n, err := ioutils.ReadFull(r, buf)
-	c.Assert(errors.Cause(err), Equals, io.EOF)
+	c.Assert(errors2.ErrorEqual(err, io.EOF), Equals, true)
 	c.Assert(n, Equals, 0)
 	c.Assert(r.Close(), IsNil)
 }
@@ -352,10 +355,10 @@ func (s *testIoPipeSuite) TestWriteAfterWriterClose(c *C) {
 
 	buf := make([]byte, 4096)
 	n, err := ioutils.ReadFull(r, buf)
-	c.Assert(errors.Cause(err), Equals, io.EOF)
+	c.Assert(errors2.ErrorEqual(err, io.EOF), Equals, true)
 	c.Assert(string(buf[:n]), Equals, ss)
 
 	err = <-errs
-	c.Assert(errors.Cause(err), Equals, io.ErrClosedPipe)
+	c.Assert(errors2.ErrorEqual(err, io.ErrClosedPipe), Equals, true)
 	c.Assert(r.Close(), IsNil)
 }

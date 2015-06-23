@@ -6,7 +6,7 @@ package bytesize
 import (
 	"testing"
 
-	"github.com/juju/errors"
+	"github.com/reborndb/go/errors2"
 	. "gopkg.in/check.v1"
 )
 
@@ -47,9 +47,9 @@ func (s *testBytesizeSuite) TestBytesize(c *C) {
 func (s *testBytesizeSuite) TestBytesizeError(c *C) {
 	var err error
 	_, err = Parse("--1")
-	c.Assert(errors.Cause(err), Equals, ErrBadBytesize)
+	c.Assert(errors2.ErrorEqual(err, ErrBadBytesize), Equals, true)
 	_, err = Parse("hello world")
-	c.Assert(errors.Cause(err), Equals, ErrBadBytesize)
+	c.Assert(errors2.ErrorEqual(err, ErrBadBytesize), Equals, true)
 	_, err = Parse("123.132.32")
-	c.Assert(errors.Cause(err), Equals, ErrBadBytesize)
+	c.Assert(errors2.ErrorEqual(err, ErrBadBytesize), Equals, true)
 }
