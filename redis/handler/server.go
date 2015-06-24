@@ -4,7 +4,7 @@
 package handler
 
 import (
-	"github.com/reborndb/go/errors"
+	"github.com/juju/errors"
 	"github.com/reborndb/go/redis/resp"
 )
 

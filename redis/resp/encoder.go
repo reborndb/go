@@ -8,8 +8,8 @@ import (
 	"bytes"
 	"strconv"
 
+	"github.com/juju/errors"
 	"github.com/ngaut/log"
-	"github.com/reborndb/go/errors"
 )
 
 type encoder struct {

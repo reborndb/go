@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/juju/errors"
 	"github.com/ngaut/log"
-	"github.com/reborndb/go/errors"
 	"github.com/reborndb/go/io/ioutils"
 )
 

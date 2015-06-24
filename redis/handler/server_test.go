@@ -9,8 +9,17 @@ import (
 	"testing"
 
 	"github.com/reborndb/go/redis/resp"
-	"github.com/reborndb/go/testing/assert"
+	. "gopkg.in/check.v1"
 )
+
+func TestT(t *testing.T) {
+	TestingT(t)
+}
+
+var _ = Suite(&testRedisHandlerSuite{})
+
+type testRedisHandlerSuite struct {
+}
 
 type testHandler struct {
 	c map[string]int
@@ -31,39 +40,49 @@ func (h *testHandler) Set(arg0 interface{}, args [][]byte) (resp.Resp, error) {
 	return h.count(args...)
 }
 
-func testmapcount(t *testing.T, m1, m2 map[string]int) {
-	assert.Must(t, len(m1) == len(m2))
+func (s *testRedisHandlerSuite) testmapcount(c *C, m1, m2 map[string]int) {
+	c.Assert(len(m1), Equals, len(m2))
+
 	for k, _ := range m1 {
-		assert.Must(t, m1[k] == m2[k])
+		c.Assert(m1[k], Equals, m2[k])
 	}
 }
 
-func TestHandlerFunc(t *testing.T) {
+func (s *testRedisHandlerSuite) TestHandlerFunc(c *C) {
 	h := &testHandler{make(map[string]int)}
-	s, err := NewServer(h)
-	assert.ErrorIsNil(t, err)
+	ss, err := NewServer(h)
+	c.Assert(err, IsNil)
+
 	key1, key2, key3, key4 := "key1", "key2", "key3", "key4"
-	s.t["get"](nil)
-	testmapcount(t, h.c, map[string]int{})
-	s.t["get"](nil, []byte(key1), []byte(key2))
-	testmapcount(t, h.c, map[string]int{key1: 1, key2: 1})
-	s.t["get"](nil, [][]byte{[]byte(key1), []byte(key3)}...)
-	testmapcount(t, h.c, map[string]int{key1: 2, key2: 1, key3: 1})
-	s.t["set"](nil)
-	testmapcount(t, h.c, map[string]int{key1: 2, key2: 1, key3: 1})
-	s.t["set"](nil, []byte(key1), []byte(key4))
-	testmapcount(t, h.c, map[string]int{key1: 3, key2: 1, key3: 1, key4: 1})
-	s.t["set"](nil, [][]byte{[]byte(key1), []byte(key2), []byte(key3)}...)
-	testmapcount(t, h.c, map[string]int{key1: 4, key2: 2, key3: 2, key4: 1})
+	ss.t["get"](nil)
+	s.testmapcount(c, h.c, map[string]int{})
+
+	ss.t["get"](nil, []byte(key1), []byte(key2))
+	s.testmapcount(c, h.c, map[string]int{key1: 1, key2: 1})
+
+	ss.t["get"](nil, [][]byte{[]byte(key1), []byte(key3)}...)
+	s.testmapcount(c, h.c, map[string]int{key1: 2, key2: 1, key3: 1})
+
+	ss.t["set"](nil)
+	s.testmapcount(c, h.c, map[string]int{key1: 2, key2: 1, key3: 1})
+
+	ss.t["set"](nil, []byte(key1), []byte(key4))
+	s.testmapcount(c, h.c, map[string]int{key1: 3, key2: 1, key3: 1, key4: 1})
+
+	ss.t["set"](nil, [][]byte{[]byte(key1), []byte(key2), []byte(key3)}...)
+	s.testmapcount(c, h.c, map[string]int{key1: 4, key2: 2, key3: 2, key4: 1})
 }
 
-func TestServerServe(t *testing.T) {
+func (s *testRedisHandlerSuite) TestServerServe(c *C) {
 	h := &testHandler{make(map[string]int)}
-	s, err := NewServer(h)
-	assert.ErrorIsNil(t, err)
+	ss, err := NewServer(h)
+	c.Assert(err, IsNil)
+
 	resp, err := resp.Decode(bufio.NewReader(bytes.NewReader([]byte("*2\r\n$3\r\nset\r\n$3\r\nfoo\r\n"))))
-	assert.ErrorIsNil(t, err)
-	_, err = s.Dispatch(nil, resp)
-	assert.ErrorIsNil(t, err)
-	testmapcount(t, h.c, map[string]int{"foo": 1})
+	c.Assert(err, IsNil)
+
+	_, err = ss.Dispatch(nil, resp)
+	c.Assert(err, IsNil)
+
+	s.testmapcount(c, h.c, map[string]int{"foo": 1})
 }
